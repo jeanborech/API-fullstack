@@ -6,11 +6,11 @@
 h1{
     margin: 40px 0 40px 0;
 
-    color: aliceblue;
+    color: black;
 }
 
 body {
-    background-color: black;
+    background-color: white;
 }
 .box, form{
     gap: 10px;
@@ -29,4 +29,22 @@ input {
 button {
     width: 150px;
     height: 25px;
+}
+
+.mensagem {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mensagem.sucesso {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.mensagem.erro {
+    background-color: #f8d7da;
+    color: #721c24;
 }

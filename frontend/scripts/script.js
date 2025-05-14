@@ -5,7 +5,21 @@ const Iemail = document.querySelector(".email");
 const Isenha = document.querySelector(".senha");
 const Itel = document.querySelector(".tel");
 
+const mensagemDiv = document.createElement("div");
+mensagemDiv.className = "mensagem";
+formulario.prepend(mensagemDiv); // Insere antes do formulário
+
+function mostrarMensagem(texto, tipo) {
+    mensagemDiv.textContent = texto;
+    mensagemDiv.className = "mensagem " + tipo; // Classes CSS: 'sucesso' ou 'erro'
+}
+
 function cadastrar(){
+
+     if (!Inome.value || !Iemail.value || !Isenha.value || !Itel.value) {
+        mostrarMensagem("Preencha todos os campos!", "erro");
+        return;
+    }
 
     fetch("http://localhost:8080/usuarios",
         {
@@ -21,9 +35,22 @@ function cadastrar(){
                 telefone: Itel.value
                })
         })
-    .then(function (res) {console.log(res)} )
-    .catch(function (res) {console.log(res) })
+    .then(response => {
+        if (response.ok) {
+            mostrarMensagem("Usuário cadastrado com sucesso!", "sucesso");
+            limpar();
+        } else {
+            response.json().then(data => {
+                mostrarMensagem(data.mensagem || "Erro ao cadastrar", "erro");
+            });
+        }
+    })
+    .catch(error => {
+        mostrarMensagem("Erro na conexão com o servidor", "erro");
+    });
 };
+
+
 
 function limpar (){
     Inome.value = "";
