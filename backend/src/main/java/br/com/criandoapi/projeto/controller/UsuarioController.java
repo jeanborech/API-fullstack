@@ -1,9 +1,13 @@
 package br.com.criandoapi.projeto.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,26 +30,56 @@ public class UsuarioController {
     private IUsuario dao;
 
     @GetMapping
-    public List<Usuario> listUsuarios() {
-        return (List<Usuario>) dao.findAll();
+    public ResponseEntity<List<Usuario>> listUsuarios() {
+        List<Usuario> lista = (List<Usuario>) dao.findAll();
+        return ResponseEntity.status(200).body(lista);
     }
 
     @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario usuario) {
-        Usuario usuarioNovo = dao.save(usuario);
-        return usuarioNovo;
+    public ResponseEntity<?> criarUsuario(@RequestBody Usuario usuario) {
+        try {
+            // Validação básica dos campos
+            if (usuario.getNome() == null || usuario.getEmail() == null) {
+                return ResponseEntity.badRequest().body(
+                        Map.of("mensagem", "Nome e e-mail são obrigatórios!"));
+            }
+
+            // Salva o usuário
+            Usuario usuarioCriado = dao.save(usuario);
+
+            // Resposta de sucesso
+            Map<String, Object> resposta = Map.of(
+                    "mensagem", "Usuário criado com sucesso!",
+                    "usuario", usuarioCriado,
+                    "timestamp", LocalDateTime.now() // Adiciona data/hora da resposta
+            );
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
+
+        } catch (DataIntegrityViolationException e) {
+            // Erro específico de violação de dados (ex: e-mail duplicado)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    Map.of("mensagem", "E-mail já cadastrado!"));
+
+        } catch (Exception e) {
+            // Erro genérico (logar o erro para debug)
+            System.err.println("Erro ao criar usuário: " + e.getMessage());
+
+            return ResponseEntity.internalServerError().body(
+                    Map.of("mensagem", "Erro interno no servidor"));
+        }
     }
 
     @PutMapping
-    public Usuario editarUsuario(@RequestBody Usuario usuario) {
-        Usuario usuarioNovo = dao.save(usuario);
-        return usuarioNovo;
+    public ResponseEntity<Usuario> editarUsuario(@RequestBody Usuario usuario) {
+        Usuario editarUsuario = dao.save(usuario);
+        return ResponseEntity.status(201).body(editarUsuario);
     }
 
     @DeleteMapping("/{id}")
-    public Optional<Usuario> deletarUsuario(@PathVariable Integer id) {
-        Optional<Usuario> usuario = dao.findById(id);
+    public ResponseEntity<?> deletarUsuario(@PathVariable Integer id) {
         dao.deleteById(id);
-        return usuario;
+        return ResponseEntity.status(204).build();
     }
+
 }
