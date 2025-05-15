@@ -1,10 +1,8 @@
 package br.com.criandoapi.projeto.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.criandoapi.projeto.entity.Usuario;
-import br.com.criandoapi.projeto.repository.IUsuario;
 import br.com.criandoapi.projeto.service.UsuarioService;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,6 +77,16 @@ public class UsuarioController {
     public ResponseEntity<?> deletarUsuario(@PathVariable Integer id) {
         usuarioService.deletarUsuario(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> validarSenha(@RequestBody Usuario usuario) {
+        Boolean valid = usuarioService.validarSenha(usuario);
+        if (!valid) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.status(200).build();
+
     }
 
 }
