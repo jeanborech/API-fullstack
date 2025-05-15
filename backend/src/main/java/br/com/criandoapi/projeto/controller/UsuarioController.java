@@ -54,7 +54,7 @@ public class UsuarioController {
             // Resposta de sucesso
             Map<String, Object> resposta = Map.of(
                     "mensagem", "Usuário criado com sucesso!",
-                    "usuario", usuarioService.criarUsuario(usuario).ge);
+                    "usuario", usuarioService.criarUsuario(usuario).getNome());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
 
