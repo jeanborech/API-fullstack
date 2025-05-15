@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.criandoapi.projeto.DAO.IUsuario;
 import br.com.criandoapi.projeto.entity.Usuario;
+import br.com.criandoapi.projeto.repository.IUsuario;
+import br.com.criandoapi.projeto.service.UsuarioService;
+
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -26,13 +28,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    @Autowired
-    private IUsuario dao;
+    private UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listUsuarios() {
-        List<Usuario> lista = (List<Usuario>) dao.findAll();
-        return ResponseEntity.status(200).body(lista);
+        return ResponseEntity.status(200).body(usuarioService.listaUsuario());
     }
 
     @PostMapping
@@ -45,14 +49,12 @@ public class UsuarioController {
             }
 
             // Salva o usuário
-            Usuario usuarioCriado = dao.save(usuario);
+            usuarioService.criarUsuario(usuario);
 
             // Resposta de sucesso
             Map<String, Object> resposta = Map.of(
                     "mensagem", "Usuário criado com sucesso!",
-                    "usuario", usuarioCriado,
-                    "timestamp", LocalDateTime.now() // Adiciona data/hora da resposta
-            );
+                    "usuario", usuarioService.criarUsuario(usuario).ge);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
 
@@ -72,13 +74,12 @@ public class UsuarioController {
 
     @PutMapping
     public ResponseEntity<Usuario> editarUsuario(@RequestBody Usuario usuario) {
-        Usuario editarUsuario = dao.save(usuario);
-        return ResponseEntity.status(201).body(editarUsuario);
+        return ResponseEntity.status(201).body(usuarioService.editarUsuario(usuario));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarUsuario(@PathVariable Integer id) {
-        dao.deleteById(id);
+        usuarioService.deletarUsuario(id);
         return ResponseEntity.status(204).build();
     }
 
