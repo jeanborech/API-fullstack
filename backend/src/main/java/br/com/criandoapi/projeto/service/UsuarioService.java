@@ -45,7 +45,7 @@ public class UsuarioService {
     }
 
     public Boolean validarSenha(Usuario usuario) {
-        String senha = repository.getById(usuario.getId()).getSenha();
+        String senha = repository.getReferenceById(usuario.getId()).getSenha();
         Boolean valid = passwordEncoder.matches(usuario.getSenha(), senha);
         return valid;
     }
